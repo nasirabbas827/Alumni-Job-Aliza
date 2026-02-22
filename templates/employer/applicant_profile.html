@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}{{ applicant.full_name|default:applicant.username }} - Candidate Profile{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="text-muted font-weight-bold text-decoration-none">
+            <i class="fas fa-chevron-left mr-1"></i> Back to Applications
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-lg text-center p-4 mb-4">
+                <div class="card-body">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="Profile" class="rounded-circle mb-3 shadow-sm border border-white" style="width:150px; height:150px; object-fit:cover;">
+                    {% else %}
+                        <div class="bg-soft-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width:150px; height:150px;">
+                            <span class="h1 mb-0 text-primary font-weight-bold">{{ applicant.username|slice:":1"|upper }}</span>
+                        </div>
+                    {% endif %}
+
+                    <h3 class="font-weight-bold mb-1">{{ applicant.full_name|default:applicant.username }}</h3>
+                    <p class="badge badge-soft-primary px-3 py-2 text-uppercase mb-4">{{ applicant.role|capfirst }}</p>
+
+                    <div class="text-left border-top pt-4">
+                        <h6 class="text-muted small font-weight-bold text-uppercase mb-3">Contact Information</h6>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-light rounded p-2 mr-3 text-secondary">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="text-truncate">
+                                <small class="text-muted d-block">Email Address</small>
+                                <a href="mailto:{{ applicant.email }}" class="text-dark font-weight-bold">{{ applicant.email }}</a>
+                            </div>
+                        </div>
+
+                        {% if profile.linkedin_url %}
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-light rounded p-2 mr-3 text-primary">
+                                <i class="fab fa-linkedin"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Professional Link</small>
+                                <a href="{{ profile.linkedin_url }}" target="_blank" class="text-primary font-weight-bold">View LinkedIn</a>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if profile.resume %}
+                        <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-primary btn-block font-weight-bold shadow-sm py-2">
+                            <i class="fas fa-file-download mr-2"></i>Download Resume
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-lg mb-4">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="mb-5">
+                        <h5 class="font-weight-bold mb-4 d-flex align-items-center text-dark">
+                            <span class="bg-primary text-white rounded p-2 mr-3" style="width:35px; height:35px; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-briefcase small"></i>
+                            </span>
+                            Professional Experience
+                        </h5>
+                        <div class="pl-md-5 border-left ml-3">
+                            <div class="text-secondary lh-lg">
+                                {{ profile.experience|default:"No experience history provided."|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5 class="font-weight-bold mb-4 d-flex align-items-center text-dark">
+                            <span class="bg-success text-white rounded p-2 mr-3" style="width:35px; height:35px; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-graduation-cap small"></i>
+                            </span>
+                            Education Background
+                        </h5>
+                        <div class="pl-md-5 border-left ml-3">
+                            <div class="text-secondary lh-lg">
+                                {{ profile.education|default:"No education history provided."|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="font-weight-bold mb-4 d-flex align-items-center text-dark">
+                            <span class="bg-warning text-white rounded p-2 mr-3" style="width:35px; height:35px; display:flex; align-items:center; justify-content:center;">
+                                <i class="fas fa-star small"></i>
+                            </span>
+                            Technical & Soft Skills
+                        </h5>
+                        <div class="pl-md-5">
+                            {% if profile.skills %}
+                                <div class="bg-light p-4 rounded-lg border">
+                                    <p class="mb-0 font-weight-medium text-dark lh-lg">{{ profile.skills }}</p>
+                                </div>
+                            {% else %}
+                                <p class="text-muted italic">No skills listed.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modern Styling Bits */
+.bg-soft-primary { background-color: #eff6ff; }
+.badge-soft-primary { background-color: #e0e7ff; color: #4338ca; border-radius: 5px; }
+.lh-lg { line-height: 1.8; }
+.rounded-lg { border-radius: 1rem !important; }
+
+/* Timeline line for Experience/Education */
+.border-left {
+    border-left: 2px solid #e9ecef !important;
+}
+
+.font-weight-medium { font-weight: 500; }
+
+/* Custom Scrollbar for long profiles */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
+{% endblock %}

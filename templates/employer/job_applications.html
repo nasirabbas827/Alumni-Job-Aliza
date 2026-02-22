@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Applications: {{ job.title }} | AlumniConnect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-transparent p-0 mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'my_posted_jobs' %}">My Jobs</a></li>
+                <li class="breadcrumb-item active">Review Candidates</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-end">
+            <div>
+                <h2 class="font-weight-bold mb-1">Candidates for {{ job.title }}</h2>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-map-marker-alt text-danger mr-1"></i> {{ job.location }} 
+                    <span class="mx-2">•</span> 
+                    <i class="fas fa-briefcase text-primary mr-1"></i> {{ job.get_job_type_display }}
+                </p>
+            </div>
+            <div class="text-right">
+                <span class="h4 font-weight-bold text-primary mb-0">{{ applications|length }}</span>
+                <p class="small text-muted text-uppercase font-weight-bold mb-0">Total Applicants</p>
+            </div>
+        </div>
+    </div>
+
+    {% if applications %}
+    <div class="card border-0 shadow-lg rounded-lg overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th class="px-4 py-3 border-0">Applicant Info</th>
+                        <th class="py-3 border-0">Applied Date</th>
+                        <th class="py-3 border-0">Resume</th>
+                        <th class="py-3 border-0">Current Status</th>
+                        <th class="py-3 border-0 text-center px-4">Update Decision</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    {% for app in applications %}
+                    <tr>
+                        <td class="px-4 py-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle mr-3">
+                                    {{ app.applicant.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <a href="{% url 'view_applicant_profile' app.applicant.user_id %}" class="h6 font-weight-bold text-dark mb-0 d-block text-decoration-none hover-link">
+                                        {{ app.applicant.full_name|default:app.applicant.username }}
+                                    </a>
+                                    {% if app.applicant.profile.is_public %}
+                                        <span class="badge badge-soft-success small" style="font-size: 0.6rem;">PUBLIC PROFILE</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4">
+                            <span class="text-muted small">
+                                <i class="far fa-calendar-alt mr-1"></i>{{ app.applied_at|date:"d M Y" }}
+                            </span>
+                        </td>
+                        <td class="py-4">
+                            {% if app.resume %}
+                                <a href="{{ app.resume.url }}" target="_blank" class="btn btn-sm btn-light border font-weight-bold text-primary">
+                                    <i class="fas fa-file-pdf mr-1 text-danger"></i> View PDF
+                                </a>
+                            {% else %}
+                                <span class="text-muted small italic">Not provided</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4">
+                            <span class="badge px-3 py-2 
+                                {% if app.status == 'applied' %}badge-soft-primary
+                                {% elif app.status == 'shortlisted' %}badge-soft-warning
+                                {% elif app.status == 'hired' %}badge-soft-success
+                                {% elif app.status == 'rejected' %}badge-soft-danger
+                                {% else %}badge-soft-secondary{% endif %}">
+                                {{ app.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <form method="post" action="{% url 'update_application_status' app.id %}" class="d-inline-block">
+                                {% csrf_token %}
+                                <div class="input-group input-group-sm">
+                                    <select name="status" class="custom-select custom-select-sm font-weight-bold border-primary text-primary" onchange="this.form.submit()" style="border-radius: 5px;">
+                                        {% for value, label in app.STATUS_CHOICES %}
+                                            <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>
+                                                Move to: {{ label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm text-center py-5">
+        <div class="card-body">
+            <div class="bg-light d-inline-block p-4 rounded-circle mb-4">
+                <i class="fas fa-users-slash fa-3x text-muted"></i>
+            </div>
+            <h4 class="font-weight-bold">No applications yet</h4>
+            <p class="text-muted mx-auto" style="max-width: 400px;">
+                As soon as candidates apply for this position, they will appear here for your review.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'my_posted_jobs' %}" class="btn btn-link text-muted font-weight-bold p-0">
+            <i class="fas fa-arrow-left mr-2"></i>Back to My Job Postings
+        </a>
+    </div>
+</div>
+
+<style>
+/* Dashboard Styles */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.badge-soft-primary { background-color: #e0e7ff; color: #4338ca; }
+.badge-soft-warning { background-color: #fef3c7; color: #92400e; }
+.badge-soft-success { background-color: #d1fae5; color: #065f46; }
+.badge-soft-danger { background-color: #fee2e2; color: #991b1b; }
+
+.badge {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    border-radius: 50px;
+}
+
+.table thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.hover-link:hover {
+    color: #2563eb !important;
+}
+
+.custom-select {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.custom-select:hover {
+    background-color: #eff6ff;
+}
+
+.rounded-lg {
+    border-radius: 1rem !important;
+}
+</style>
+{% endblock %}

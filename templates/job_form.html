@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Post / Edit Job | AlumniConnect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-4 d-none d-lg-flex flex-column justify-content-center bg-dark text-white p-5 rounded-left shadow-lg">
+            <h2 class="font-weight-bold mb-4">Find the Best Talent.</h2>
+            <ul class="list-unstyled">
+                <li class="mb-4">
+                    <i class="fas fa-bullhorn text-warning mr-2"></i>
+                    <strong>Reach Alumni:</strong> Get your job in front of experienced professionals.
+                </li>
+                <li class="mb-4">
+                    <i class="fas fa-map-marker-alt text-warning mr-2"></i>
+                    <strong>Targeted Search:</strong> Filter by location and specific skills.
+                </li>
+                <li class="mb-4">
+                    <i class="fas fa-handshake text-warning mr-2"></i>
+                    <strong>Quality Hires:</strong> Connect with trusted members of your alma mater.
+                </li>
+            </ul>
+            <div class="mt-4 border-top border-secondary pt-4">
+                <small class="opacity-50 italic">
+                    "Building professional bridges across the community."
+                </small>
+            </div>
+        </div>
+
+        <div class="col-lg-7 col-md-10 px-0">
+            <div class="card border-0 shadow-lg p-4 rounded-right">
+                <div class="card-body">
+
+                    <div class="text-center mb-4">
+                        <div class="bg-light d-inline-block p-3 rounded-circle mb-3">
+                            <i class="fas fa-briefcase fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="font-weight-bold">Post / Edit Job</h3>
+                        <p class="text-muted small">Fill in the details to attract the right candidates</p>
+                    </div>
+
+                    <form method="post" class="registration-form">
+                        {% csrf_token %}
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.title.label }}</label>
+                            {{ form.title }}
+                            {% for error in form.title.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.location.label }}</label>
+                            {{ form.location }}
+                            {% for error in form.location.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="small font-weight-bold text-dark">{{ form.salary_min.label }}</label>
+                                {{ form.salary_min }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small font-weight-bold text-dark">{{ form.salary_max.label }}</label>
+                                {{ form.salary_max }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="small font-weight-bold text-dark">{{ form.job_type.label }}</label>
+                                {{ form.job_type }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small font-weight-bold text-dark">{{ form.category.label }}</label>
+                                {{ form.category }}
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.skills_required.label }}</label>
+                            {{ form.skills_required }}
+                            <small class="text-muted">Separate skills with commas (e.g., Python, Django, SQL)</small>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-dark">{{ form.description.label }}</label>
+                            {{ form.description }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-sm font-weight-bold">
+                            <i class="fas fa-paper-plane mr-2"></i> Save Job Posting
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Reusing your Registration and Global Styles */
+.registration-form input, 
+.registration-form select, 
+.registration-form textarea {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: #495057;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.registration-form textarea {
+    min-height: 120px;
+}
+
+.registration-form input:focus, 
+.registration-form select:focus,
+.registration-form textarea:focus {
+    background-color: #fff;
+    border-color: #2563eb;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+}
+
+/* Border Utilities */
+.rounded-left { border-radius: 1rem 0 0 1rem !important; }
+.rounded-right { border-radius: 0 1rem 1rem 0 !important; }
+
+@media (max-width: 991px) {
+    .rounded-right { border-radius: 1rem !important; }
+}
+
+.opacity-50 { opacity: 0.5; }
+.italic { font-style: italic; }
+</style>
+{% endblock %}

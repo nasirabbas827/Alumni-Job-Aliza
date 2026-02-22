@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Login | Alumni Job Portal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-4 d-none d-lg-flex flex-column justify-content-center bg-dark text-white p-5 rounded-left shadow-lg">
+            <h2 class="font-weight-bold mb-4">Welcome Back.</h2>
+            <ul class="list-unstyled">
+                <li class="mb-4">
+                    <i class="fas fa-sign-in-alt text-warning mr-2"></i>
+                    <strong>Resume Progress:</strong> Check your application status.
+                </li>
+                <li class="mb-4">
+                    <i class="fas fa-briefcase text-warning mr-2"></i>
+                    <strong>New Listings:</strong> See who is hiring today.
+                </li>
+                <li class="mb-4">
+                    <i class="fas fa-comments text-warning mr-2"></i>
+                    <strong>Networking:</strong> Stay connected with your peers.
+                </li>
+            </ul>
+            <div class="mt-4 border-top border-secondary pt-4">
+                <small class="opacity-50 italic">
+                    "Secure access to your professional community."
+                </small>
+            </div>
+        </div>
+
+        <div class="col-lg-5 col-md-8 px-0">
+            <div class="card border-0 shadow-lg p-4 rounded-right" style="min-height: 600px;">
+                <div class="card-body">
+
+                    <div class="text-center mb-4">
+                        <div class="bg-light d-inline-block p-3 rounded-circle mb-3">
+                            <i class="fas fa-lock fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="font-weight-bold">Secure Login</h3>
+                        <p class="text-muted small">
+                            Enter your credentials to access the portal
+                        </p>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger small">
+                            {% for error in form.non_field_errors %}
+                                <div><i class="fas fa-exclamation-circle mr-1"></i> {{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" class="login-form">
+                        {% csrf_token %}
+
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-dark">
+                                {{ form.email.label }}
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-right-0">
+                                        <i class="fas fa-envelope text-muted"></i>
+                                    </span>
+                                </div>
+                                {{ form.email }}
+                            </div>
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-dark">
+                                {{ form.password.label }}
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-right-0">
+                                        <i class="fas fa-key text-muted"></i>
+                                    </span>
+                                </div>
+                                {{ form.password }}
+                            </div>
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary btn-block btn-lg shadow-sm font-weight-bold">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Authenticate
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-5 text-center">
+                        <p class="text-muted small">
+                            New to the Portal?
+                            <a href="{% url 'register' %}" class="text-primary font-weight-bold ml-1">
+                                <i class="fas fa-user-plus mr-1"></i>
+                                Create account
+                            </a>
+                        </p>
+                    </div>
+                    <div class="mt-2 text-center">
+    <p class="text-muted small">
+        Forgot password?
+        <a href="{% url 'reset_password' %}" class="text-primary font-weight-bold ml-1">
+            Reset here
+        </a>
+    </p>
+</div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Synchronized styles with Register.html */
+.login-form input {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: #495057;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0.5rem 0.5rem 0; /* Rounded right for input-group */
+    transition: all 0.2s ease-in-out;
+}
+
+.input-group-text {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.login-form input:focus {
+    background-color: #fff;
+    border-color: #2563eb;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+}
+
+.rounded-left {
+    border-radius: 1rem 0 0 1rem !important;
+}
+
+.rounded-right {
+    border-radius: 0 1rem 1rem 0 !important;
+}
+
+@media (max-width: 991px) {
+    .rounded-right {
+        border-radius: 1rem !important;
+    }
+}
+
+.opacity-50 { opacity: 0.5; }
+.italic { font-style: italic; }
+</style>
+{% endblock %}

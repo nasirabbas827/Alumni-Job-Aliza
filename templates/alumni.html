@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Alumni Dashboard | AlumniConnect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    
+    <div class="alert alert-primary alert-dismissible fade show shadow-sm border-0 mb-4" role="alert" style="border-left: 5px solid #0d6efd !important;">
+        <i class="fas fa-bell mr-2"></i> <strong>New Opportunities:</strong> There are 5 new jobs posted in your category today.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="font-weight-bold text-dark">Welcome Back, {{ user.full_name|default:user.username }}!</h2>
+            <p class="text-muted">Manage your job postings and track your own applications from one place.</p>
+        </div>
+        <div class="d-flex">
+            <a href="{% url 'job_create' %}" class="btn btn-primary shadow-sm mr-2">
+                <i class="fas fa-plus-circle mr-1"></i> Post a Job
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-white text-center p-3">
+                <div class="text-primary mb-2"><i class="fas fa-briefcase fa-2x"></i></div>
+                <h3 class="font-weight-bold mb-0">{{ total_posted }}</h3>
+                <small class="text-muted font-weight-bold text-uppercase">Jobs Posted</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-white text-center p-3">
+                <div class="text-success mb-2"><i class="fas fa-users fa-2x"></i></div>
+                <h3 class="font-weight-bold mb-0">{{ total_received }}</h3>
+                <small class="text-muted font-weight-bold text-uppercase">Applications Received</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-white text-center p-3">
+                <div class="text-info mb-2"><i class="fas fa-paper-plane fa-2x"></i></div>
+                <h3 class="font-weight-bold mb-0">{{ total_applied }}</h3>
+                <small class="text-muted font-weight-bold text-uppercase">My Applications</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm bg-white text-center p-3">
+                <div class="text-warning mb-2"><i class="fas fa-bookmark fa-2x"></i></div>
+                <h3 class="font-weight-bold mb-0">{{ total_bookmarks }}</h3>
+                <small class="text-muted font-weight-bold text-uppercase">Saved Jobs</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 d-flex justify-content-between">
+                    <h5 class="font-weight-bold mb-0">New Job Postings</h5>
+                    <a href="{% url 'job_list_search' %}" class="small font-weight-bold">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <tbody>
+                                {% for job in latest_jobs %}
+                                <tr>
+                                    <td>
+                                        <h6 class="mb-0 font-weight-bold">{{ job.title }}</h6>
+                                        <small class="text-muted">{{ job.employer.full_name }} • {{ job.location }}</small>
+                                    </td>
+                                    <td class="text-right">
+                                        <a href="{% url 'job_detail' job.id %}" class="btn btn-sm btn-outline-primary px-3">View</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="2" class="text-center text-muted">No new jobs available.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4">
+                    <h5 class="font-weight-bold mb-0">My Recent Applications</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="text-muted small text-uppercase">
+                                <tr>
+                                    <th>Job</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in my_applications_list %}
+                                <tr>
+                                    <td class="font-weight-bold">{{ app.job.title }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if app.status == 'hired' %}badge-success
+                                            {% elif app.status == 'rejected' %}badge-danger
+                                            {% else %}badge-primary{% endif %} px-2 py-1">
+                                            {{ app.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">{{ app.applied_at|date:"d M" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted py-4">You haven't applied to any jobs yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="bg-soft-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-user-tie fa-2x text-primary"></i>
+                    </div>
+                    <h5 class="font-weight-bold mb-0">{{ user.full_name }}</h5>
+                    <p class="text-muted small">Alumni / Recruiter</p>
+                    <hr>
+                    <div class="text-left">
+                        <h6 class="small font-weight-bold text-uppercase text-muted mb-3">Quick Management</h6>
+                        <a href="{% url 'my_posted_jobs' %}" class="btn btn-light btn-block text-left mb-2">
+                            <i class="fas fa-list-ul mr-2 text-primary"></i> Manage My Jobs
+                        </a>
+                        <a href="{% url 'bookmarked_jobs' %}" class="btn btn-light btn-block text-left mb-2">
+                            <i class="fas fa-heart mr-2 text-danger"></i> Saved Opportunities
+                        </a>
+                        <a href="{% url 'my_applications' %}" class="btn btn-light btn-block text-left">
+                            <i class="fas fa-history mr-2 text-success"></i> Application History
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 bg-dark text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="font-weight-bold"><i class="fas fa-graduation-cap mr-2 text-warning"></i>Mentor a Student</h6>
+                    <p class="small opacity-75">Your experience can change a student's career path. Join the mentorship program.</p>
+                    <button class="btn btn-warning btn-sm btn-block font-weight-bold">Become a Mentor</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-soft-primary { background-color: #eef2ff; }
+    .card { border-radius: 12px; }
+    .table td { border-top: 1px solid #f8f9fa; }
+    .opacity-75 { opacity: 0.75; }
+</style>
+{% endblock %}

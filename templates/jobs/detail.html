@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} | AlumniConnect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-transparent p-0">
+            <li class="breadcrumb-item"><a href="{% url 'job_list_search' %}" class="text-primary">Jobs</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{{ job.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-lg overflow-hidden mb-4">
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h2 class="font-weight-bold mb-1">{{ job.title }}</h2>
+                            <p class="lead text-primary font-weight-bold mb-0">
+                                <i class="fas fa-building mr-2"></i>{{ job.employer.full_name|default:job.employer.username }}
+                            </p>
+                            <p class="text-muted mt-1">
+                                <i class="fas fa-map-marker-alt mr-2 text-danger"></i>{{ job.location }}
+                            </p>
+                        </div>
+                        
+                        {% if match_percentage > 0 %}
+                        <div class="text-right">
+                            <span class="badge badge-pill p-3 shadow-sm 
+                                {% if match_percentage >= 70 %}badge-success
+                                {% elif match_percentage >= 40 %}badge-warning
+                                {% else %}badge-secondary{% endif %}">
+                                <i class="fas fa-bullseye mr-2"></i>{{ match_percentage|floatformat:1 }}% Match
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row bg-light rounded-lg p-3 mb-4 mx-0 border">
+                        <div class="col-sm-6 mb-2 mb-sm-0 border-right">
+                            <h6 class="text-uppercase text-muted small font-weight-bold mb-1">Employment Type</h6>
+                            <p class="mb-0 font-weight-bold text-dark"><i class="fas fa-clock mr-2 text-primary"></i>{{ job.get_job_type_display }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <h6 class="text-uppercase text-muted small font-weight-bold mb-1">Offered Salary</h6>
+                            <p class="mb-0 font-weight-bold text-dark">
+                                <i class="fas fa-wallet mr-2 text-success"></i>
+                                {% if job.salary_min and job.salary_max %}
+                                   RS {{ job.salary_min|floatformat:0 }} – {{ job.salary_max|floatformat:0 }}
+                                {% elif job.salary_min %}
+                                   RS {{ job.salary_min|floatformat:0 }}+
+                                {% else %}
+                                    Not Disclosed
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5 class="font-weight-bold mb-3 border-bottom pb-2">Required Skills</h5>
+                        <div class="d-flex flex-wrap">
+                            <div class="bg-white border rounded p-3 w-100 shadow-sm" style="border-left: 4px solid #3b82f6 !important;">
+                                <i class="fas fa-tools mr-2 text-primary"></i>
+                                <span class="text-dark font-weight-medium">{{ job.skills_required }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h5 class="font-weight-bold mb-3 border-bottom pb-2">Job Description</h5>
+                        <div class="job-description-content text-secondary lh-lg">
+                            {{ job.description|linebreaks }}
+                        </div>
+                    </div>
+
+                    <div class="text-muted small border-top pt-3">
+                        <i class="fas fa-calendar-alt mr-2"></i>Posted on {{ job.created_at|date:"d M Y" }}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-lg mb-4 sticky-top" style="top: 100px; z-index: 10;">
+                <div class="card-body p-4">
+                    <h5 class="font-weight-bold mb-4">Application Hub</h5>
+
+                    {% if job.employer == user %}
+                        <div class="alert alert-warning border-0 small shadow-sm">
+                            <i class="fas fa-info-circle mr-2"></i>This is your listing.
+                        </div>
+                        <a href="{% url 'my_posted_jobs' %}" class="btn btn-dark btn-block font-weight-bold">View Candidates</a>
+                    {% elif has_applied %}
+                        <div class="alert alert-success border-0 shadow-sm d-flex align-items-center">
+                            <i class="fas fa-check-circle fa-2x mr-3"></i>
+                            <div>
+                                <h6 class="mb-0 font-weight-bold">Applied!</h6>
+                                <small>You applied for this job.</small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <form method="post" enctype="multipart/form-data" class="mb-3">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="apply">
+                            
+                            <div class="form-group mb-4">
+                                <label class="small font-weight-bold text-dark">Submit Latest Resume</label>
+                                <div class="custom-resume-upload">
+                                    {{ application_form.resume }}
+                                </div>
+                                {% if application_form.resume.errors %}
+                                    <div class="text-danger small mt-1">{{ application_form.resume.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block btn-lg shadow font-weight-bold mb-3">
+                                <i class="fas fa-paper-plane mr-2"></i>Send Application
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="toggle_bookmark">
+                        <button type="submit" class="btn btn-outline-secondary btn-block font-weight-bold">
+                            <i class="fas fa-bookmark mr-2 {% if is_bookmarked %}text-primary{% endif %}"></i>
+                            {% if is_bookmarked %}Saved to Bookmarks{% else %}Bookmark Job{% endif %}
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <h6 class="text-uppercase text-muted small font-weight-bold mb-3">Resources</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a href="{% url 'job_list_search' %}" class="text-secondary"><i class="fas fa-arrow-left mr-2"></i>All Job Listings</a></li>
+                        <li class="mb-2"><a href="{% url 'bookmarked_jobs' %}" class="text-secondary"><i class="fas fa-folder mr-2"></i>My Saved Jobs</a></li>
+                        <li class="mb-0"><a href="{% url 'my_applications' %}" class="text-secondary"><i class="fas fa-history mr-2"></i>Application History</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Descriptive typography */
+.lh-lg { line-height: 1.8; }
+
+.badge-success { background-color: #10b981; color: white; }
+.badge-warning { background-color: #f59e0b; color: white; }
+.badge-secondary { background-color: #64748b; color: white; }
+
+.job-description-content {
+    font-size: 1.05rem;
+}
+
+/* Customizing the file input to fit the theme */
+.custom-resume-upload input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+}
+
+
+</style>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Update Profile | AlumniConnect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-4 d-none d-lg-flex flex-column justify-content-center bg-dark text-white p-5 rounded-left shadow-lg">
+            <h2 class="font-weight-bold mb-4">Manage Your Profile</h2>
+            <ul class="list-unstyled">
+                <li class="mb-4">
+                    <i class="fas fa-graduation-cap text-warning mr-2"></i>
+                    <strong>Education:</strong> Highlight your academic journey.
+                </li>
+                <li class="mb-4">
+                    <i class="fas fa-briefcase text-warning mr-2"></i>
+                    <strong>Experience:</strong> List your professional milestones.
+                </li>
+                <li class="mb-4">
+                    <i class="fas fa-file-pdf text-warning mr-2"></i>
+                    <strong>Resume:</strong> Keep your CV ready for recruiters.
+                </li>
+                <li class="mb-4">
+                    <i class="fas fa-tools text-warning mr-2"></i>
+                    <strong>Skills:</strong> Showcase what you do best.
+                </li>
+            </ul>
+            <div class="mt-4 border-top border-secondary pt-4">
+                <small class="opacity-50 italic">
+                    "Your professional profile is your digital handshake."
+                </small>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-8 px-0">
+            <div class="card border-0 shadow-lg p-4 rounded-right">
+                <div class="card-body">
+
+                    <div class="text-center mb-4">
+                        <div class="profile-image-container mb-3">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="profile-preview-circle shadow">
+                            {% else %}
+                                <div class="profile-preview-placeholder shadow d-flex align-items-center justify-content-center mx-auto">
+                                    <i class="fas fa-user fa-3x text-secondary"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <h3 class="font-weight-bold">Update Profile</h3>
+                        <p class="text-muted small">Keep your professional information updated</p>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="registration-form">
+                        {% csrf_token %}
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.linkedin_url.label }}</label>
+                            {{ form.linkedin_url }}
+                            {% for error in form.linkedin_url.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.education.label }}</label>
+                            {{ form.education }}
+                            {% for error in form.education.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.experience.label }}</label>
+                            {{ form.experience }}
+                            {% for error in form.experience.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.skills.label }}</label>
+                            {{ form.skills }}
+                            {% for error in form.skills.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">{{ form.resume.label }}</label>
+                            <div class="custom-file-upload">
+                                {{ form.resume }}
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="small font-weight-bold text-dark">Change Profile Picture</label>
+                            <div class="custom-file-upload">
+                                {{ form.profile_picture }}
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4 mt-3 custom-control custom-switch">
+                            {{ form.is_public }}
+                            <label class="form-check-label font-weight-bold ml-2" for="{{ form.is_public.id_for_label }}">
+                                Make Profile Public
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block btn-lg shadow-sm font-weight-bold">
+                            <i class="fas fa-save mr-2"></i> Save Profile Changes
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Reusing your Registration Styles */
+.registration-form input, 
+.registration-form select, 
+.registration-form textarea {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: #495057;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.registration-form input:focus, 
+.registration-form textarea:focus {
+    background-color: #fff;
+    border-color: #2563eb;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+}
+
+/* Circular Image Styling */
+.profile-preview-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff;
+    outline: 1px solid #e2e8f0;
+}
+
+.profile-preview-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+/* Border Utilities */
+.rounded-left { border-radius: 1rem 0 0 1rem !important; }
+.rounded-right { border-radius: 0 1rem 1rem 0 !important; }
+
+@media (max-width: 991px) {
+    .rounded-right { border-radius: 1rem !important; }
+}
+
+.opacity-50 { opacity: 0.5; }
+.italic { font-style: italic; }
+</style>
+{% endblock %}

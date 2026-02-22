@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard | AlumniConnect{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    
+    <div class="alert alert-info alert-dismissible fade show shadow-sm border-0 mb-4" role="alert" style="border-left: 5px solid #0dcaf0 !important;">
+        <i class="fas fa-lightbulb mr-2 text-primary"></i> <strong>Career Tip:</strong> Complete your profile details to get 40% better job matches from Alumni recruiters.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="font-weight-bold">Student Dashboard</h2>
+            <p class="text-muted">Explore opportunities and track your career progress, <strong>{{ user.full_name|default:user.username }}</strong>.</p>
+        </div>
+        <div class="d-flex">
+            <a href="{% url 'job_list_search' %}" class="btn btn-primary shadow-sm mr-2">
+                <i class="fas fa-search mr-1"></i> Find Jobs
+            </a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger shadow-sm">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3 border-bottom border-primary">
+                <h6 class="text-muted small text-uppercase font-weight-bold">Applications Sent</h6>
+                <h2 class="font-weight-bold text-primary mb-0">{{ applied_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3 border-bottom border-warning">
+                <h6 class="text-muted small text-uppercase font-weight-bold">Saved Jobs</h6>
+                <h2 class="font-weight-bold text-warning mb-0">{{ saved_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-3 border-bottom border-success">
+                <h6 class="text-muted small text-uppercase font-weight-bold">Offers Received</h6>
+                <h2 class="font-weight-bold text-success mb-0">{{ hired_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="bg-soft-primary text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-user-graduate fa-2x"></i>
+                    </div>
+                    <h4 class="font-weight-bold mb-1">{{ user.full_name|default:user.username }}</h4>
+                    <span class="badge badge-pill badge-primary text-uppercase px-3 mb-3">{{ user.role }}</span>
+                    
+                    <div class="text-left border-top pt-3 mt-2 small">
+                        <p class="mb-2"><i class="fas fa-envelope mr-2 text-muted"></i> {{ user.email }}</p>
+                        <p class="mb-2"><i class="fas fa-id-card mr-2 text-muted"></i> ID: #STUD-{{ user.user_id|add:"1000" }}</p>
+                        <p class="mb-0"><i class="fas fa-circle mr-2 text-success"></i> Account {{ user.status|capfirst }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm bg-dark text-white p-2">
+                <div class="card-body">
+                    <h6 class="font-weight-bold"><i class="fas fa-rocket mr-2 text-warning"></i>Goal Tracking</h6>
+                    <p class="small opacity-75">You've applied to {{ applied_count }} jobs this month. Keep going!</p>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 65%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 d-flex justify-content-between">
+                    <h5 class="font-weight-bold mb-0">Recommended for You</h5>
+                    <a href="{% url 'job_list_search' %}" class="small font-weight-bold">Browse All</a>
+                </div>
+                <div class="card-body">
+                    {% for job in recommended_jobs %}
+                    <div class="p-3 border rounded mb-3 hover-shadow transition">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="font-weight-bold mb-1 text-dark">{{ job.title }}</h6>
+                                <p class="small text-muted mb-0">{{ job.location }} • {{ job.get_job_type_display }}</p>
+                            </div>
+                            <a href="{% url 'job_detail' job.id %}" class="btn btn-primary btn-sm px-3">Apply</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-muted py-3">No new recommendations today.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4">
+                    <h5 class="font-weight-bold mb-0">My Application History</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light small text-uppercase">
+                                <tr>
+                                    <th class="px-4">Company & Job</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in recent_applications %}
+                                <tr>
+                                    <td class="px-4">
+                                        <div class="font-weight-bold">{{ app.job.title }}</div>
+                                        <small class="text-muted">{{ app.job.employer.full_name }}</small>
+                                    </td>
+                                    <td class="small">{{ app.applied_at|date:"d M Y" }}</td>
+                                    <td>
+                                        <span class="badge badge-soft-{% if app.status == 'hired' %}success{% elif app.status == 'rejected' %}danger{% elif app.status == 'shortlisted' %}warning{% else %}primary{% endif %}">
+                                            {{ app.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted small">You haven't applied to any jobs yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-soft-primary { background-color: #eef2ff; }
+    .badge-soft-primary { background-color: #e0e7ff; color: #4338ca; }
+    .badge-soft-success { background-color: #d1fae5; color: #065f46; }
+    .badge-soft-warning { background-color: #fef3c7; color: #92400e; }
+    .badge-soft-danger { background-color: #fee2e2; color: #991b1b; }
+    .transition { transition: all 0.3s ease; }
+    .hover-shadow:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .card { border-radius: 15px; overflow: hidden; }
+    .opacity-75 { opacity: 0.75; }
+</style>
+{% endblock %}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AlumniConnect | Job Portal{% endblock %}</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Ubuntu:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --light-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: #334155;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--primary-color) !important;
+            padding: 0.8rem 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            color: var(--accent-color) !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #cbd5e1 !important;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color) !important;
+        }
+
+        footer {
+            background: var(--primary-color);
+            color: #94a3b8;
+            padding-top: 3rem;
+            margin-top: auto;
+            border-top: 4px solid var(--accent-color);
+        }
+
+        .footer-heading {
+            color: #f8fafc;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .footer-bottom {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">
+            <i class="fas fa-graduation-cap mr-2"></i>Alumni<span class="text-white">Connect</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+
+                {% if request.session.user_id %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle font-weight-bold text-white" href="#" id="roleDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="roleDropdown">
+                        {% if request.session.role == 'alumni' %}
+                        <a class="dropdown-item" href="{% url 'alumni_dashboard' %}">Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'job_list' %}">Jobs</a>
+                        <a class="dropdown-item" href="{% url 'job_list_search' %}">List Jobs</a>
+                        <a class="dropdown-item" href="{% url 'bookmarked_jobs' %}">Bookmarked Jobs</a>
+                        <a class="dropdown-item" href="{% url 'my_applications' %}">Applications</a>
+                        <a class="dropdown-item" href="{% url 'my_posted_jobs' %}">My Posted Jobs Application</a>
+                        {% elif request.session.role == 'employer' %}
+                        <a class="dropdown-item" href="{% url 'employer_dashboard' %}">Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'job_list' %}">Jobs</a>
+                        <a class="dropdown-item" href="{% url 'my_posted_jobs' %}">My Posted Jobs Application</a>
+                        {% else %}
+                        <a class="dropdown-item" href="{% url 'student_dashboard' %}">Dashboard</a>
+                        <a class="dropdown-item" href="{% url 'job_list_search' %}">List Jobs</a>
+                        <a class="dropdown-item" href="{% url 'bookmarked_jobs' %}">Bookmarked Jobs</a>
+                        <a class="dropdown-item" href="{% url 'my_applications' %}">Applications</a>
+                        {% endif %}
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-info" href="{% url 'update_profile' %}">
+                        <i class="fas fa-user-circle mr-1"></i> {{ request.session.username }}
+                        <span class="small">({{ request.session.role|capfirst }})</span>
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle text-warning" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-bell"></i>
+        <span class="badge badge-danger" id="notification-count">0</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+        <h6 class="dropdown-header">Notifications</h6>
+        <div id="notification-list">
+            <p class="dropdown-item small text-muted">No new notifications</p>
+        </div>
+    </div>
+</li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{% url 'logout' %}">
+                        <i class="fas fa-power-off"></i> Logout
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <div>
+        {% if messages %}
+        <div class="container">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="footer-heading">About Portal</h5>
+                    <p class="small">An Online Job Portal bridging the gap between Students, Alumni, and Employers.
+                        Securely connect and find opportunities.</p>
+                </div>
+                <div class="col-lg-4 mb-4 text-center">
+                    <h5 class="footer-heading">Quick Access</h5>
+                    <ul class="list-unstyled small">
+                        <li><a href="{% url 'register' %}">Student Registration</a></li>
+                        <li><a href="{% url 'register' %}">Employer Posting</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5 class="footer-heading">Support</h5>
+                    <a href="mailto:support@alumniconnect.com" class="btn btn-outline-info btn-sm btn-block">Email
+                        Support</a>
+                </div>
+            </div>
+            <div class="footer-bottom text-center">
+                <p class="mb-0 small">&copy; {% now "Y" %} <strong>AlumniConnect Network</strong></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+function loadNotifications() {
+    $.ajax({
+        url: "{% url 'fetch_notifications' %}", // Django view to fetch notifications
+        type: "GET",
+        success: function(data) {
+            let list = $('#notification-list');
+            let count = data.unread_count;
+            $('#notification-count').text(count);
+
+            if(data.notifications.length > 0){
+                list.empty();
+                data.notifications.forEach(function(notif){
+                    let item = `<a href="${notif.link || '#'}" class="dropdown-item ${notif.is_read ? '' : 'font-weight-bold'}">
+                                    ${notif.message}
+                                    <br><small class="text-muted">${notif.time_ago}</small>
+                                </a>`;
+                    list.append(item);
+                });
+            } else {
+                list.html('<p class="dropdown-item small text-muted">No new notifications</p>');
+            }
+        }
+    });
+}
+
+// Load notifications every 10 seconds
+setInterval(loadNotifications, 10000);
+$(document).ready(loadNotifications);
+</script>
+</body>
+
+</html>

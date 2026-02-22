@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Employer Dashboard | AlumniConnect{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    
+    {% if total_applications > 0 %}
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert" style="border-left: 5px solid #28a745 !important;">
+        <i class="fas fa-user-check mr-2"></i> <strong>Talent Alert:</strong> You have received {{ total_applications }} total applications across your listings.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="font-weight-bold text-dark">Employer Console</h2>
+            <p class="text-muted">Manage your job postings and find top campus talent.</p>
+        </div>
+        <div>
+            <a href="{% url 'job_create' %}" class="btn btn-success shadow-sm mr-2">
+                <i class="fas fa-plus-circle mr-1"></i> Post New Job
+            </a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger shadow-sm">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase small">Active Postings</h6>
+                            <h2 class="font-weight-bold mb-0">{{ active_postings }}</h2>
+                        </div>
+                        <i class="fas fa-file-invoice fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase small">Total Applications</h6>
+                            <h2 class="font-weight-bold mb-0">{{ total_applications }}</h2>
+                        </div>
+                        <i class="fas fa-users fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase small">Shortlisted</h6>
+                            <h2 class="font-weight-bold mb-0">{{ interviews_set }}</h2>
+                        </div>
+                        <i class="fas fa-calendar-check fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="bg-light text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 80px; height: 80px; border: 2px solid #3b82f6;">
+                        <i class="fas fa-building fa-2x"></i>
+                    </div>
+                    <h4 class="font-weight-bold mb-1">{{ user.full_name|default:user.username }}</h4>
+                    <p class="badge badge-soft-dark text-uppercase px-3">Hiring Manager</p>
+                    <hr>
+                    <div class="text-left small">
+                        <p class="mb-2"><i class="fas fa-envelope mr-2 text-muted"></i> {{ user.email }}</p>
+                        <p class="mb-2"><i class="fas fa-briefcase mr-2 text-muted"></i> <strong>Company:</strong> Global Tech Industries</p>
+                        <p class="mb-0"><i class="fas fa-check-circle mr-2 text-success"></i> <strong>Account:</strong> Verified Employer</p>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{% url 'my_posted_jobs' %}" class="btn btn-outline-primary btn-sm btn-block font-weight-bold">
+                            Manage All Postings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 d-flex justify-content-between align-items-center">
+                    <h5 class="font-weight-bold mb-0 text-dark">Recent Applications</h5>
+                    <span class="badge badge-pill badge-light border text-muted px-3">Last 5 entries</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="border-0 small text-uppercase font-weight-bold">Applicant</th>
+                                    <th class="border-0 small text-uppercase font-weight-bold">Position</th>
+                                    <th class="border-0 small text-uppercase font-weight-bold">Status</th>
+                                    <th class="border-0 small text-uppercase font-weight-bold text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in recent_applications %}
+                                <tr>
+                                    <td>
+                                        <div class="font-weight-bold text-dark">{{ app.applicant.full_name|default:app.applicant.username }}</div>
+                                        <small class="text-muted">{{ app.applicant.get_role_display }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="text-secondary small font-weight-bold">{{ app.job.title }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if app.status == 'applied' %}badge-soft-primary
+                                            {% elif app.status == 'shortlisted' %}badge-soft-warning
+                                            {% elif app.status == 'hired' %}badge-soft-success
+                                            {% else %}badge-soft-danger{% endif %} px-2 py-1">
+                                            {{ app.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'job_applications' app.job.id %}" class="btn btn-sm btn-light border font-weight-bold">Review</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                        No applications received yet.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .badge-soft-dark { background-color: #f8f9fa; color: #343a40; border: 1px solid #dee2e6; }
+    .badge-soft-primary { background-color: #eef2ff; color: #4338ca; }
+    .badge-soft-warning { background-color: #fffbeb; color: #92400e; }
+    .badge-soft-success { background-color: #ecfdf5; color: #065f46; }
+    .badge-soft-danger { background-color: #fef2f2; color: #991b1b; }
+    .opacity-50 { opacity: 0.5; }
+    .card { border-radius: 15px; }
+    .table-hover tbody tr:hover { background-color: #fbfcfe; }
+</style>
+{% endblock %}
